@@ -1,12 +1,13 @@
 // ==== CONFIG (edit this) ====
 window.APP = {
-  url: "https://qddjhayaqkdcxqgdriav.supabase.co",
-  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkZGpoYXlhcWtkY3hxZ2RyaWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyODEzMzUsImV4cCI6MjA3Nzg1NzMzNX0.Z_w3O9z6ZdZKt1TS3p4e6YYeUl1XHlCohLAatbA7g2U",
+  url: "https://bwndinezdmvhdtrqrmby.supabase.co",
+  key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3bmRpbmV6ZG12aGR0cnFybWJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3MDc0MTIsImV4cCI6MjA3ODI4MzQxMn0.c38MVBY5zGbHATMWSJoVWXJxZgqHx5uFWg18HWVdEBA",
 
-  ownerId: "8cd15b4b-0755-4843-a8d5-2652fa408fe5",
+  ownerId: "31b20c2e-4c51-4d2f-8b7d-6316cc4ee19f",
   admins: [
-    "4e63c32b-cc75-48de-b111-e8a977d868a2",
-    "20851a7b-ef92-41a1-80d1-d2a6081396d5"
+    "2cbe12d3-ce01-4212-a0df-b8b2892cfa11",
+    "5ef3a5a2-3491-41f6-b604-ce019485e6e2",
+    "d6ad0e8c-e1b1-41c1-b086-e27b974161c9"
   ],
 
   // Flat list with category (and parent for nested Vivamax items)
