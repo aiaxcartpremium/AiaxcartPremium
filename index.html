@@ -1,16 +1,252 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>AiaxStock</title>
-  <link rel="stylesheet" href="./style.css?v=1" />
-  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script defer src="./config.js?v=2"></script>
-  <script>
-    // simple redirect to login
-    window.addEventListener("DOMContentLoaded", ()=>location.replace("./login.html"));
-  </script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Owner • AiaxCart</title>
+  <link rel="stylesheet" href="./style.css"/>
+
+  <!-- CDN libs first -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Optional: your config (if present it will be used) -->
+  <script src="./config.js?v=fix1"></script>
+
+  <style>
+    /* minimal tab/panel styles in case style.css didn’t load */
+    .tabs{display:flex;gap:10px;margin:12px 0}
+    .tab{padding:8px 14px;border-radius:8px;border:1px solid #2a2a2a;background:#101318;cursor:pointer}
+    .tab.active{outline:2px solid #5b8cff}
+    .panel{display:none}
+    .panel.is-visible{display:block}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:720px){.grid-2{grid-template-columns:1fr}}
+    .card{padding:16px;border:1px solid #222;border-radius:12px;background:#0d0f14}
+    .table .row{display:grid;grid-template-columns:70px 1fr 1fr 1fr 1fr 1fr;gap:8px;padding:6px 0;border-bottom:1px solid #222}
+    .table .row.head{font-weight:600;border-bottom:2px solid #333}
+    .container{max-width:980px;margin:0 auto;padding:18px}
+    .btn{padding:10px 14px;border-radius:8px;border:0;background:#5b8cff;color:#fff;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid #2a2a2a}
+    label{display:flex;flex-direction:column;gap:6px}
+    select,input{height:40px;border-radius:8px;border:1px solid #2a2a2a;background:#0b0e12;color:#e8e8e8;padding:0 10px}
+  </style>
 </head>
-<body></body>
+<body>
+  <nav class="nav">
+    <div class="container" style="display:flex;align-items:center;gap:12px">
+      <div class="brand" style="font-weight:700;font-size:20px">AiaxStock</div>
+      <div style="flex:1"></div>
+      <a href="./login.html" class="btn ghost">Logout</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h1>Owner</h1>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="add">Add Stock</button>
+      <button class="tab" data-tab="stocks">Stocks</button>
+      <button class="tab" data-tab="records">Records</button>
+    </div>
+
+    <!-- Panels -->
+    <section id="panel-add" class="panel is-visible">
+      <form id="frm-add" class="card">
+        <div class="grid-2">
+          <label>Product
+            <select id="selProduct" required></select>
+          </label>
+          <label>Account type
+            <select id="selType" required></select>
+          </label>
+          <label>Duration
+            <select id="selDuration" required></select>
+          </label>
+          <label>Quantity
+            <input id="qty" type="number" min="1" value="1" required/>
+          </label>
+          <label>Email <input id="email" type="text" placeholder="login email"/></label>
+          <label>Password <input id="password" type="text" placeholder="login password"/></label>
+          <label>Profile <input id="profile" type="text" placeholder="profile name"/></label>
+          <label>PIN <input id="pin" type="text" placeholder="profile pin"/></label>
+          <label>Premiummed at <input id="premAt" type="date"/></label>
+          <label>Auto-archive if unsold (days)
+            <input id="archDays" type="number" min="0"/>
+          </label>
+        </div>
+        <div style="margin-top:12px">
+          <button id="btnAdd" class="btn" type="submit">Save Stock</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="panel-stocks" class="panel">
+      <div class="card">
+        <h3>Stocks</h3>
+        <div id="stocksTable" class="table"></div>
+      </div>
+    </section>
+
+    <section id="panel-records" class="panel">
+      <div class="card">
+        <h3>Records</h3>
+        <div id="recordsTable" class="table"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (function(){
+    // ---------- tiny helpers
+    const $ = (s,el=document)=>el.querySelector(s);
+    const $$ = (s,el=document)=>Array.from(el.querySelectorAll(s));
+    const toast = (m)=>alert(m);
+    const showPanel = (name)=>{
+      $$('.panel').forEach(p=>p.classList.remove('is-visible'));
+      $('#panel-'+name).classList.add('is-visible');
+      $$('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+    };
+
+    // ---------- session (uuid/role must exist from login)
+    const UID_KEY='aiax.uid', ROLE_KEY='aiax.role';
+    const adminUUID = sessionStorage.getItem(UID_KEY);
+    const role = sessionStorage.getItem(ROLE_KEY);
+    if(!adminUUID || !role){
+      toast('App not loaded: missing role/uuid. Redirecting to login.');
+      location.href='./login.html';
+      return;
+    }
+
+    // ---------- supabase client
+    const FALLBACK_CFG = {
+      SUPABASE_URL: (window.CONFIG && CONFIG.SUPABASE_URL) || '',
+      SUPABASE_ANON_KEY: (window.CONFIG && CONFIG.SUPABASE_ANON_KEY) || ''
+    };
+    if(!FALLBACK_CFG.SUPABASE_URL || !FALLBACK_CFG.SUPABASE_ANON_KEY){
+      // allow quick test by reading from script[data-…] if you ever add it
+      // but still continue; the error below will show clearly.
+    }
+    const supa = window.supabase.createClient(FALLBACK_CFG.SUPABASE_URL, FALLBACK_CFG.SUPABASE_ANON_KEY);
+
+    // ---------- tabs
+    $$('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>showPanel(btn.dataset.tab));
+    });
+
+    // ---------- selects fill
+    function fillSelect(id, rows, valueKey, labelKey){
+      const sel = document.getElementById(id);
+      sel.innerHTML = '';
+      rows.forEach(r=>{
+        const o = document.createElement('option');
+        o.value = r[valueKey];
+        o.textContent = r[labelKey];
+        sel.appendChild(o);
+      });
+    }
+
+    async function loadLookups(){
+      try {
+        const [p1,p2,p3] = await Promise.all([
+          supa.rpc('list_products'),
+          supa.rpc('list_account_types'),
+          supa.rpc('list_durations')
+        ]);
+        if(p1.error || p2.error || p3.error){
+          console.error(p1.error||p2.error||p3.error);
+          toast('Lookups failed (check RPC grants).');
+          return;
+        }
+        fillSelect('selProduct',  p1.data, 'key',   'label');
+        fillSelect('selType',     p2.data, 'label', 'label');
+        fillSelect('selDuration', p3.data, 'code',  'label');
+      } catch(err){
+        console.error(err);
+        toast('Could not load lookups.');
+      }
+    }
+
+    // ---------- save stock
+    $('#frm-add').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const row = {
+        admin_uuid: adminUUID,
+        product_key: $('#selProduct').value,
+        account_type: $('#selType').value,
+        duration_code: $('#selDuration').value,
+        qty: parseInt($('#qty').value||'1',10),
+        login_email: $('#email').value||null,
+        login_password: $('#password').value||null,
+        profile_name: $('#profile').value||null,
+        profile_pin: $('#pin').value||null,
+        premiummed_at: $('#premAt').value||null,
+        auto_archive_days: $('#archDays').value ? parseInt($('#archDays').value,10) : null,
+        status: 'available'
+      };
+      const { error } = await supa.from('stocks').insert(row);
+      if(error){ console.error(error); return toast('Failed to save stock.'); }
+      toast('Stock saved ✅');
+      loadStocks();
+    });
+
+    // ---------- load stocks/records
+    async function loadStocks(){
+      const { data, error } = await supa
+        .from('stocks')
+        .select('id, product_key, account_type, duration_code, status, created_at')
+        .eq('admin_uuid', adminUUID)
+        .order('created_at',{ascending:false})
+        .limit(100);
+      if(error){ console.error(error); return; }
+      const host = $('#stocksTable');
+      host.innerHTML = `
+        <div class="row head"><div>ID</div><div>Product</div><div>Type</div>
+          <div>Duration</div><div>Status</div><div>Created</div></div>
+        ${data.map(r=>`
+          <div class="row">
+            <div>${r.id}</div>
+            <div>${r.product_key}</div>
+            <div>${r.account_type}</div>
+            <div>${r.duration_code}</div>
+            <div>${r.status}</div>
+            <div>${new Date(r.created_at).toLocaleString()}</div>
+          </div>`).join('')}
+      `;
+    }
+
+    async function loadRecords(){
+      const { data, error } = await supa
+        .from('records')
+        .select('id,buyer_name,product_key,account_type,duration_code,price,created_at')
+        .eq('admin_uuid', adminUUID)
+        .order('created_at',{ascending:false})
+        .limit(100);
+      if(error){ console.error(error); return; }
+      const host = $('#recordsTable');
+      host.innerHTML = `
+        <div class="row head"><div>ID</div><div>Buyer</div><div>Product</div>
+          <div>Type</div><div>Duration</div><div>Price</div><div>Created</div></div>
+        ${data.map(r=>`
+          <div class="row">
+            <div>${r.id}</div>
+            <div>${r.buyer_name??''}</div>
+            <div>${r.product_key}</div>
+            <div>${r.account_type}</div>
+            <div>${r.duration_code}</div>
+            <div>${r.price??''}</div>
+            <div>${new Date(r.created_at).toLocaleString()}</div>
+          </div>`).join('')}
+      `;
+    }
+
+    // ---------- boot
+    (async function boot(){
+      await loadLookups();
+      await loadStocks();
+      await loadRecords();
+    })();
+  })();
+  </script>
+</body>
 </html>
