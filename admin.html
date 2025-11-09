@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin • AiaxStock</title>
+  <link rel="stylesheet" href="./style.css?v=1" />
+  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="./config.js?v=1"></script>
+  <script type="module" src="./admin.js?v=1"></script>
+</head>
+<body>
+  <div class="loading-overlay hidden">Loading…</div>
+  <div class="toast"></div>
+
+  <section class="container">
+    <div class="topbar">
+      <h1>AiaxStock Management — Admin</h1>
+      <div class="toolbar">
+        <a href="./owner.html" class="btn btn-ghost">Go to Owner</a>
+        <button id="btnLogout" class="btn btn-secondary" type="button">Logout</button>
+      </div>
+    </div>
+
+    <h2>Available Stocks</h2>
+    <div id="catBar" class="chips"></div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Product</th><th>Type</th><th>Duration</th><th>Qty</th></tr></thead>
+        <tbody id="adminStocksBody"><tr><td colspan="4" class="muted">No data yet</td></tr></tbody>
+      </table>
+    </div>
+
+    <h2>Get Account</h2>
+    <div class="grid-3">
+      <label>Category <select id="catSelectAdmin"></select></label>
+      <label>Product  <select id="productSelectAdmin"></select></label>
+      <label>Account type <select id="typeSelectAdmin"></select></label>
+      <label>Duration <select id="durSelectAdmin"></select></label>
+    </div>
+    <div class="actions"><button id="getAccountBtn" class="btn btn-primary" type="button">Get Account</button></div>
+    <div id="adminCreds"></div>
+
+    <h2>My Buyers Record</h2>
+    <div class="table-wrap">
+      <table class="table" id="adminRecordsTable">
+        <thead><tr><th>ID</th><th>Product</th><th>Type</th><th>Created</th><th>Expires</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</body>
+</html>
