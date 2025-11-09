@@ -1,115 +1,94 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Owner • AiaxStock</title>
-  <link rel="stylesheet" href="./style.css?v=1" />
-  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script defer src="./config.js?v=1"></script>
-  <script type="module" src="./owner.js?v=1"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Owner • AiaxCart</title>
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Libs (load first) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- App config + shared helpers -->
+  <script defer src="./config.js"></script>
+  <script defer src="./common.js"></script>
+
+  <!-- Owner page logic (must be last) -->
+  <script defer src="./owner.js" type="module"></script>
 </head>
 <body>
-  <div class="loading-overlay hidden">Loading…</div>
-  <div class="toast"></div>
+  <nav class="nav">
+    <div class="nav-inner container">
+      <div class="brand">AiaxStock</div>
+      <div class="spacer"></div>
+      <a href="./login.html" class="btn ghost">Logout</a>
+    </div>
+  </nav>
 
-  <section class="container">
-    <div class="topbar">
-      <h1>AiaxStock Management — Owner</h1>
-      <div class="toolbar">
-        <a href="./admin.html" class="btn btn-ghost">Go to Admin</a>
-        <button id="btnLogout" class="btn btn-secondary" type="button">Logout</button>
-      </div>
+  <main class="container" style="padding-top:24px">
+    <h1>Owner</h1>
+
+    <!-- Tabs -->
+    <div class="tabs" style="margin:12px 0 18px">
+      <button class="tab active" data-tab="add">Add Stock</button>
+      <button class="tab" data-tab="stocks">Stocks</button>
+      <button class="tab" data-tab="records">Records</button>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" data-target="tabAdd">Add Stock</button>
-      <button class="tab" data-target="tabStocks">Stocks</button>
-      <button class="tab" data-target="tabRecords">Records</button>
-    </div>
-
-    <!-- Add Stock -->
-    <div id="tabAdd" class="tab-page">
-      <div class="grid-2">
-        <label>Product <select id="productSelectOwner"></select></label>
-        <label>Account type <select id="typeSelectOwner"></select></label>
-        <label>Duration <select id="durSelectOwner"></select></label>
-        <label>Quantity <input id="oaQty" type="number" value="1" min="1" /></label>
-      </div>
-
-      <div class="grid-2">
-        <label>Email <input id="oaEmail" placeholder="login email" /></label>
-        <label>Password <input id="oaPass" placeholder="login password" /></label>
-        <label>Profile <input id="oaProfile" placeholder="profile name" /></label>
-        <label>PIN <input id="oaPin" placeholder="profile pin" /></label>
-      </div>
-
-      <div class="grid-2">
-        <label>Premiumed at <input id="oaPremiumedAt" type="datetime-local" /></label>
-        <label>Auto-archive if unsold (days) <input id="oaAutoExpireDays" type="number" min="1" placeholder="e.g., 5" /></label>
-      </div>
-
-      <label>Notes <input id="oaNotes" placeholder="any notes" /></label>
-      <div class="actions"><button id="oaAddBtn" class="btn btn-primary" type="button">Add Stock</button></div>
-    </div>
-
-    <!-- Stocks -->
-    <div id="tabStocks" class="tab-page hidden">
-      <div class="row between">
-        <h2>Current Stocks</h2>
-        <div class="row" style="gap:8px">
-          <button id="btnOwnerRefresh" class="btn btn-outline" type="button">Refresh</button>
-          <button id="btnOwnerPurge" class="btn btn-outline" type="button">Auto-Archive Now</button>
-          <label style="display:flex;align-items:center;gap:6px">
-            <input id="chkShowArchived" type="checkbox" />
-            <span class="muted">show archived</span>
+    <!-- Panels -->
+    <section id="panel-add" class="panel is-visible">
+      <form id="frm-add" class="card">
+        <div class="grid-2">
+          <label>Product
+            <select id="selProduct" required></select>
+          </label>
+          <label>Account type
+            <select id="selType" required></select>
+          </label>
+          <label>Duration
+            <select id="selDuration" required></select>
+          </label>
+          <label>Quantity
+            <input id="qty" type="number" min="1" value="1" required />
+          </label>
+          <label>Email
+            <input id="email" type="text" placeholder="login email" />
+          </label>
+          <label>Password
+            <input id="password" type="text" placeholder="login password" />
+          </label>
+          <label>Profile
+            <input id="profile" type="text" placeholder="profile name" />
+          </label>
+          <label>PIN
+            <input id="pin" type="text" placeholder="profile pin" />
+          </label>
+          <label>Premiummed at
+            <input id="premAt" type="date" />
+          </label>
+          <label>Auto-archive if unsold (days)
+            <input id="archDays" type="number" min="0" />
           </label>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table class="table" id="ownerStocksTable">
-          <thead><tr>
-            <th>ID</th><th>Product</th><th>Type</th><th>Duration</th><th>Qty</th>
-            <th>Premiumed</th><th>Listed</th><th>Auto-Exp (d)</th><th>Archived</th><th>Actions</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Records -->
-    <div id="tabRecords" class="tab-page hidden">
-      <h2>Sales / Buyer Records</h2>
-
-      <div class="card" style="margin-bottom:12px">
-        <div class="grid-3">
-          <label>Product <input id="recProduct" placeholder="e.g., Netflix" /></label>
-          <label>Account type <input id="recType" placeholder="e.g., shared profile" /></label>
-          <label>Expires at <input id="recExpires" type="datetime-local" /></label>
+        <div style="margin-top:12px">
+          <button id="btnAdd" class="btn">Save Stock</button>
         </div>
-        <div class="grid-3">
-          <label>Buyer link <input id="recBuyer" placeholder="link or handle" /></label>
-          <label>Price <input id="recPrice" type="number" step="0.01" placeholder="0.00" /></label>
-          <label style="display:flex;align-items:center;gap:10px;margin-top:22px">
-            <input id="recWarranty" type="checkbox" /><span>With warranty</span>
-            <input id="recExtraDays" type="number" min="0" placeholder="+ days" style="max-width:120px" />
-          </label>
-        </div>
-        <div class="actions"><button id="btnAddRecord" class="btn btn-primary" type="button">Add Record</button></div>
-      </div>
+      </form>
+    </section>
 
-      <div class="table-wrap">
-        <table class="table" id="ownerRecordsTable">
-          <thead><tr>
-            <th>ID</th><th>Product</th><th>Type</th><th>Created</th><th>Expires</th>
-            <th>Admin</th><th>Buyer link</th><th>Price</th><th>Actions</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+    <section id="panel-stocks" class="panel">
+      <div class="card">
+        <h3>Stocks</h3>
+        <div id="stocksTable" class="table"></div>
       </div>
+    </section>
 
-      <div class="actions"><button id="btnExportCSV" class="btn btn-outline" type="button">Export CSV</button></div>
-    </div>
-  </section>
+    <section id="panel-records" class="panel">
+      <div class="card">
+        <h3>Records</h3>
+        <div id="recordsTable" class="table"></div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
