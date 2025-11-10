@@ -1,161 +1,179 @@
-/* ==========================================================================
-   AiaxCart • Dessert Rose Theme (Pastel #10)
-   Drop-in replacement for style.css
-   ========================================================================== */
+/* ========== AiaxStock – Dessert Rose theme (2025-11-10) ========== */
 
+/* ------ Palette (Dessert rose) ------ */
 :root{
-  /* Palette */
-  --rose-1:#ECCBC9; /* light peach-rose */
-  --rose-2:#E0C5C4; /* muted rose */
-  --rose-3:#D0A0A3; /* dusty rose (primary) */
-  --rose-4:#F5E2E3; /* very light pink */
-  --rose-5:#ECEBE8; /* warm light gray */
+  --rose-1:#ECCBC9;  /* light rose */
+  --rose-2:#E0C5C4;  /* soft rose */
+  --rose-3:#D0A0A3;  /* accent rose */
+  --rose-4:#F5E2E3;  /* pale rose */
+  --mist   :#ECEBE8; /* warm gray */
+  --ink    :#1a1b1e; /* text on dark */
+  --ink-2  :#2b2d31;
+  --white  :#ffffff;
 
-  /* App tokens */
-  --bg:#faf9f9;
-  --card:#ffffff;
-  --line:#efecec;
-  --text:#3c2f33;          /* deep cocoa */
-  --muted:#7e6a70;         /* muted cocoa */
-  --pri:var(--rose-3);
-  --pri-ghost:var(--rose-2);
-  --pri-soft:var(--rose-4);
-  --accent:var(--rose-1);
-  --danger:#c14b54;
-  --radius:12px;
-  --shadow-lg:0 12px 30px rgba(208,160,163,.18);
-  --shadow-sm:0 2px 10px rgba(0,0,0,.04);
+  --radius :14px;
+  --shadow :0 10px 30px rgba(0,0,0,.25);
 }
 
-/* ===== Base / Typography ================================================== */
+/* ------ Reset / base ------ */
 *{box-sizing:border-box}
-html,body{
-  margin:0; padding:0; background:var(--bg); color:var(--text);
-  font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-}
-h1,h2,h3{margin:0 0 .4rem}
-h1{font-size:40px; letter-spacing:.3px}
-h2{font-size:22px}
-.muted{color:var(--muted)}
-a{color:var(--pri); text-decoration:none}
-a:hover{text-decoration:underline}
-
-/* ===== Layout ============================================================= */
-.container{max-width:1060px; margin:0 auto; padding:22px}
-.row{display:flex; gap:16px; flex-wrap:wrap}
-.card{
-  background:var(--card); border:1px solid var(--line);
-  border-radius:var(--radius); box-shadow:var(--shadow-sm);
-  padding:16px;
+html,body{height:100%}
+body{
+  margin:0;
+  font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);
+  /* subtle rose gradient so the center card pops even on bright screens */
+  background:
+    radial-gradient(1200px 600px at 50% 0%, var(--rose-4), transparent 60%),
+    linear-gradient(180deg, var(--mist) 0%, var(--rose-1) 100%);
+  background-attachment: fixed;
 }
 
-/* ===== Inputs / Forms ===================================================== */
-input,select,textarea{
-  width:100%; height:44px; padding:0 12px;
-  color:var(--text); background:#fff;
-  border:1px solid var(--line); border-radius:10px;
-  transition:border-color .15s, box-shadow .15s, background .15s;
-}
-textarea{min-height:120px; padding:12px}
-input::placeholder,textarea::placeholder{color:#998c90}
-input:focus,select:focus,textarea:focus{
-  outline:0; border-color:var(--pri);
-  box-shadow:0 0 0 3px color-mix(in oklab, var(--pri) 20%, #fff);
-}
-label{display:block; font-weight:600; margin:10px 0 6px}
-
-/* ===== Buttons ============================================================ */
-.btn{display:inline-flex; align-items:center; justify-content:center;
-  height:40px; padding:0 14px; border-radius:10px; border:1px solid transparent;
-  font-weight:600; cursor:pointer; user-select:none; transition:.15s;
-}
-.btn:disabled{opacity:.5; cursor:not-allowed}
-
-.btn-primary{background:var(--pri); border-color:var(--pri); color:#fff}
-.btn-primary:hover{filter:brightness(.96)}
-
-.btn-secondary{background:var(--pri-ghost); border-color:var(--pri-ghost); color:#fff}
-.btn-secondary:hover{filter:brightness(.97)}
-
-.btn-outline{background:transparent; color:var(--pri); border-color:var(--pri)}
-.btn-outline:hover{background:var(--pri-soft)}
-
-.btn-ghost{background:var(--rose-5); color:var(--text); border:1px solid var(--line)}
-.btn-ghost:hover{filter:brightness(.98)}
-
-.btn-danger{background:var(--danger); color:#fff; border-color:var(--danger)}
-
-/* Button groups (tabs/chips style) */
-.btn-group{display:flex; gap:10px; flex-wrap:wrap}
-.tab,.chip{
-  background:var(--rose-5); border:1px solid var(--line);
-  color:var(--text); border-radius:999px; padding:8px 14px; cursor:pointer;
-}
-.tab.active,.chip.active{background:var(--pri); border-color:var(--pri); color:#fff}
-
-/* ===== Tables ============================================================= */
-.table{width:100%; border-collapse:separate; border-spacing:0; border-radius:12px; overflow:hidden}
-.table th,.table td{padding:10px 12px; border-bottom:1px solid var(--line); text-align:left}
-.table th{background:var(--rose-5); font-weight:700}
-.table tr:hover td{background:var(--rose-4)}
-
-/* ===== Toast & Loading ==================================================== */
-.toast{
-  position:fixed; inset:auto 20px 20px auto; max-width:360px;
-  background:var(--text); color:#fff; padding:12px 14px; border-radius:10px;
-  box-shadow:var(--shadow-sm);
-}
-.loading-overlay{
-  position:fixed; inset:0; display:none; place-items:center;
-  background:#0005; z-index:90;
-}
-.loading-overlay.show{display:grid}
-
-/* ===== Topbar (optional soft wash) ======================================= */
-.topbar{
-  background:linear-gradient(180deg, var(--rose-4), transparent);
-  padding:10px 12px; border-radius:12px; margin-bottom:14px;
-}
-
-/* ===== Login view (centered, roomy) ====================================== */
-/* Ensure your login wrapper has: id="viewLogin" class="container center" */
-#viewLogin.container.center{
-  min-height:100dvh; display:grid; place-items:center; padding:24px;
-}
-.login-card{
-  background:var(--card); border:1px solid var(--line);
-  border-radius:16px; box-shadow:var(--shadow-lg);
-  width:min(720px, 92vw); padding:28px 28px 22px;
-}
-#viewLogin h1{font-size:40px; margin:0 0 6px}
-#viewLogin .muted{margin:0 0 14px}
-.role-buttons{display:flex; gap:12px; flex-wrap:wrap; margin:18px 0}
-.role-buttons .btn{box-shadow:0 1px 0 rgba(0,0,0,.02)}
-.account-details{display:grid; gap:10px; margin-top:12px}
-#continueOwner,#continueAdmin{height:44px}
-
-/* ===== Cards & sections (Owner/Admin pages) =============================== */
-.section{margin:14px 0; padding:14px; background:var(--card);
-  border:1px solid var(--line); border-radius:12px}
-.section-title{font-weight:800; margin-bottom:8px}
-
-/* ===== Small helpers ====================================================== */
+/* utility */
 .hidden{display:none !important}
-.center{text-align:center}
-.right{text-align:right}
-.grid{display:grid; gap:12px}
-.grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media (max-width:840px){ .grid.cols-2,.grid.cols-3{grid-template-columns:1fr} }
+.muted{opacity:.75}
 
-/* ===== Nav tabs for Owner page =========================================== */
-.owner-tabs{display:flex; gap:10px; margin-bottom:14px}
-.owner-tabs .tab{border-radius:10px; padding:8px 14px}
+/* ------ Layout helpers ------ */
+.container{
+  width:100%;
+  max-width:1100px;
+  margin-inline:auto;
+  padding:24px;
+}
+.container.center{
+  min-height:100dvh; /* mobile friendly */
+  display:grid;
+  place-items:center;
+  padding:32px;
+  position:relative;
+  z-index:1; /* ensures clickability above any bg elements */
+}
 
-/* ===== Badges / status ==================================================== */
-.badge{display:inline-block; padding:4px 10px; border-radius:999px; font-weight:600}
-.badge-soft{background:var(--rose-4); color:var(--text); border:1px solid var(--rose-5)}
-.badge-pri{background:var(--pri); color:#fff}
+/* ------ Card ------ */
+.card,
+.login-card{
+  width:min(720px, 100%);
+  background:color-mix(in oklab, var(--white) 80%, var(--rose-4) 20%);
+  border:1px solid color-mix(in oklab, var(--rose-2) 60%, #000 0%);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px 28px 24px 28px;
+  backdrop-filter:saturate(110%) blur(6px);
+}
+.login-card.big{ padding:40px 36px }
 
-/* ===== Footer / credits =================================================== */
-.footer{color:var(--muted); font-size:13px; text-align:center; padding:18px 0}
+/* ------ Typography ------ */
+h1,h2,h3{margin:0 0 .6rem 0; font-weight:700; letter-spacing:.2px}
+h1{font-size:clamp(28px, 3vw, 36px); color:var(--ink-2)}
+h2{font-size:22px}
+
+/* ------ Buttons / Tabs ------ */
+.btn,
+button,
+a.button{
+  appearance:none;
+  border:0;
+  border-radius:12px;
+  padding:12px 18px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .06s ease, box-shadow .2s ease, background .2s ease;
+  color:#fff;
+  background:linear-gradient(180deg, var(--rose-3), color-mix(in oklab, var(--rose-3) 85%, #000 10%));
+  box-shadow:0 6px 16px rgba(208,160,163,.35);
+}
+.btn:hover{ transform:translateY(-1px) }
+.btn:active{ transform:translateY(0) scale(.98) }
+
+.btn.ghost{
+  color:var(--ink);
+  background:var(--rose-4);
+  border:1px solid var(--rose-2);
+  box-shadow:none;
+}
+
+/* segmented tabs */
+.tabs{ display:flex; gap:10px; flex-wrap:wrap; }
+.tab{
+  padding:10px 14px; border-radius:10px;
+  background:var(--mist); color:var(--ink-2); font-weight:600;
+}
+.tab.active{ background:var(--rose-2); color:#fff }
+
+/* ------ Forms ------ */
+input, select, textarea{
+  width:100%;
+  outline:none;
+  border:1px solid color-mix(in oklab, var(--rose-2) 45%, #000 0%);
+  background: #fff;
+  border-radius:12px;
+  padding:12px 14px;
+  font:inherit;
+  transition:border .2s ease, box-shadow .2s ease, background .2s ease;
+}
+select{ background-image: none; }
+input::placeholder, textarea::placeholder{ color:#8b8f93 }
+input:focus, select:focus, textarea:focus{
+  border-color:var(--rose-3);
+  box-shadow:0 0 0 4px color-mix(in oklab, var(--rose-3) 25%, #fff 0%);
+}
+
+/* label + field block */
+.field{ margin:14px 0 }
+.label{ margin:0 0 6px; font-weight:600; color:var(--ink-2) }
+
+/* inline groups */
+.row{display:grid; gap:12px}
+.row.two{grid-template-columns:1fr 1fr}
+@media (max-width:640px){ .row.two{grid-template-columns:1fr} }
+
+/* ------ Toast ------ */
+.toast{
+  position:fixed; inset:auto 16px 16px 16px; z-index:50;
+  display:none; padding:12px 14px; border-radius:10px;
+  background:var(--ink-2); color:#fff;
+}
+.toast.show{ display:block }
+
+/* ------ Loading overlay (FIX: never blocks clicks when hidden) ------ */
+.loading-overlay{
+  position:fixed; inset:0; z-index:40;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.18); backdrop-filter:blur(2px);
+}
+.loading-overlay.hidden{
+  display:none !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+}
+
+/* ------ Top nav (if any) ------ */
+.nav{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:14px 18px;
+  background:linear-gradient(180deg, color-mix(in oklab, var(--rose-1) 60%, #fff 0%), transparent);
+  border-bottom:1px solid color-mix(in oklab, var(--rose-2) 30%, #000 0%);
+}
+.nav .brand{ font-weight:800; letter-spacing:.3px }
+
+/* ------ Login page specific ------ */
+.login-actions{
+  display:flex; gap:12px; flex-wrap:wrap; margin-top:16px;
+}
+.login-actions .btn{ min-width:150px }
+
+/* ------ Tables (Owner/Admin lists) ------ */
+.table{
+  width:100%; border-collapse:separate; border-spacing:0;
+  background:#fff; border:1px solid var(--mist); border-radius:12px; overflow:hidden;
+}
+.table thead th{
+  text-align:left; font-weight:800; padding:12px 14px;
+  background:var(--rose-4); border-bottom:1px solid var(--mist);
+}
+.table tbody td{ padding:12px 14px; border-bottom:1px solid #eee }
+.table tbody tr:last-child td{ border-bottom:0 }
+.table tbody tr:hover{ background:#fff6f7 }
+
+/* ------ Footer spacer (mobile safe area) ------ */
+.safe{ height:20px }
